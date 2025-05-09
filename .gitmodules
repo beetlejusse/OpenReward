@@ -1,0 +1,3 @@
+[submodule "escrowContract/lib/forge-std"]
+	path = escrowContract/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
