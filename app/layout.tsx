@@ -1,12 +1,21 @@
-import { CivicAuthProvider } from "@civic/auth/nextjs";
+'use client';
 
-export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) {
+import { UserProvider } from '@civic/auth-web3/react';
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>
-        <CivicAuthProvider>
+        <UserProvider
+          appId={process.env.NEXT_PUBLIC_CIVIC_APP_ID || ''}
+          authFlowType="popup" // or "redirect" based on your preference
+        >
           {children}
-        </CivicAuthProvider>
+        </UserProvider>
       </body>
     </html>
   );
