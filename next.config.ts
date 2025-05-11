@@ -1,20 +1,15 @@
-import { createCivicAuthPlugin } from "@civic/auth/nextjs";
 import type { NextConfig } from "next";
 
-const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  images: {
-    unoptimized: true,
-  },
-}
-
+import { createCivicAuthPlugin } from "@civic/auth-web3/nextjs";
 const withCivicAuth = createCivicAuthPlugin({
-  clientId: '4ad3aa19-4fe3-4d6c-a22b-0f7840c307ae',
+  // eslint-disable-next-line no-undef
+  clientId: process.env.CLIENT_ID || '',
+  // eslint-disable-next-line no-undef
+  oauthServer: process.env.AUTH_SERVER || 'https://auth.civic.com/oauth',
 });
 
-export default withCivicAuth(nextConfig);
+const nextConfig: NextConfig = {
+  /* config options here */
+};
+
+export default withCivicAuth(nextConfig);;

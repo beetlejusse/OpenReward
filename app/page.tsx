@@ -1,26 +1,25 @@
-'use client';
+import { UserButton, useUser } from "@civic/auth-web3/react";
+import { Web3Zone } from "@/components/web3Zone";
+import { AuthHeader } from "@/components/AuthHeader";
 
-import Link from 'next/link';
-import { UserButton } from '@civic/auth-web3/react';
-
-export default function Home() {
+const Page = async () => {
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Web3 App with Civic Auth</h1>
-        <UserButton />
+    <>
+      <div className="z-10 flex h-full flex-col p-4">
+        <div className="flex flex-1 flex-col items-center justify-center gap-8">
+          <h1 className="text-4xl font-bold">Civic Auth Web3 NextJS</h1>
+
+          <AuthHeader />
+
+
+          <Web3Zone />
+          <footer className="absolute bottom-8 text-center text-sm text-slate-500">
+            <p>©2025 Civic Technologies, Inc. All Rights Reserved</p>
+          </footer>
+        </div>
       </div>
-      
-      <p className="mb-6">
-        Sign in with your email to create a wallet and view your Sepolia ETH balance.
-      </p>
-      
-      <Link 
-        href="/wallet" 
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        View My Wallet
-      </Link>
-    </div>
+    </>
   );
-}
+};
+
+export default Page;
