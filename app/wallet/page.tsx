@@ -29,7 +29,7 @@ export default function WalletPage() {
         
         // Connect to Sepolia network
         const provider = new ethers.JsonRpcProvider(
-          "https://eth-sepolia.g.alchemy.com/v2/8SUFta4rDXuck3z8NyanYOMsPifEzOH3"
+          process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL
         );
         
         // Get wallet address from Civic Auth

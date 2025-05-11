@@ -3,7 +3,7 @@
 import { FC, PropsWithChildren } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CivicAuthProvider } from "@civic/auth-web3/nextjs";
-import { polygonAmoy, baseSepolia, sepolia, xdcTestnet, mainnet } from "viem/chains";
+import { sepolia, mainnet } from "viem/chains";
 import { Chain, http } from "viem";
 import { createConfig, WagmiProvider } from "wagmi";
 import { embeddedWallet } from "@civic/auth-web3/wagmi";
@@ -11,7 +11,7 @@ import { embeddedWallet } from "@civic/auth-web3/wagmi";
 const queryClient = new QueryClient();
 
 // Configure chains and RPC URLs.
-export const supportedChains = [baseSepolia, mainnet] as [
+export const supportedChains = [sepolia, mainnet] as [
   Chain,
   ...Chain[],
 ];
@@ -19,11 +19,10 @@ export const supportedChains = [baseSepolia, mainnet] as [
 const wagmiConfig = createConfig({
   chains: supportedChains,
   transports: {
-    [baseSepolia.id]: http(),
+    [sepolia.id]: http(process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL),
   },
   connectors: [embeddedWallet()],
   ssr: true,
-  
 });
 
 // Add this type for the Providers props
@@ -35,8 +34,8 @@ export const Providers: FC<ProvidersProps> = ({ children }) => {
   return (
       <QueryClientProvider client={queryClient}>
             <WagmiProvider config={wagmiConfig}>
-              {/* The need for initialChain here will be removed in an upcoming version of @civic/auth-web3 */}
-              <CivicAuthProvider initialChain={baseSepolia}>
+              {/* The need for initialChain here will be removed in an upcoming release */}
+              <CivicAuthProvider initialChain={sepolia}>
                 {children}
               </CivicAuthProvider>
             </WagmiProvider>
