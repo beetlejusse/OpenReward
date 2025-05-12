@@ -1,9 +1,7 @@
-// models/BountyProviderModel.ts
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const BountyProviderSchema = new Schema({
-  // Core Identity Fields
+const BountyHunterSchema = new Schema({
   walletAddress: {
     type: String,
     required: true,
@@ -21,7 +19,6 @@ const BountyProviderSchema = new Schema({
     required: true
   },
   
-  // Profile Information
   profilePicture: {
     type: String,
     default: null
@@ -30,59 +27,44 @@ const BountyProviderSchema = new Schema({
     type: String,
     default: null
   },
-  website: {
-    type: String,
-    default: null
+  skills: {
+    type: [String],
+    default: []
   },
   githubProfile: {
     type: String,
     default: null
   },
-  companyName: {
-    type: String,
-    default: null
+  joinedDate: {
+    type: Date,
+    default: Date.now
   },
-  
-  // Bounty Management
-  bountiesListed: {
+
+  bountiesParticipatedIn: {
     type: Number,
     default: 0
   },
-  bountiesDistributed: {
+  bountiesWon: {
     type: Number,
     default: 0
   },
-  totalAmountDistributed: {
+  totalAmountWon: {
     type: Number,
     default: 0
   },
   activeBounties: {
     type: [String],
     default: []
-  },
-  completedBounties: {
-    type: [String],
-    default: []
-  },
-  
-  // Financial Information
-  availableBalance: {
-    type: Number,
-    default: 0
-  },
-  lockedBalance: {
-    type: Number,
-    default: 0
   }
 }, {
-  timestamps: true // Adds createdAt and updatedAt fields automatically
+  timestamps: true 
 });
 
 // Create indexes for frequently queried fields
-BountyProviderSchema.index({ walletAddress: 1 });
-BountyProviderSchema.index({ email: 1 });
-BountyProviderSchema.index({ companyName: 1 });
+BountyHunterSchema.index({ walletAddress: 1 });
+BountyHunterSchema.index({ email: 1 });
+BountyHunterSchema.index({ githubProfile: 1 });
 
-const BountyProvider = mongoose.model('BountyProvider', BountyProviderSchema);
+export const BountyHunter = mongoose.model('BountyHunter', BountyHunterSchema);
 
-module.exports = BountyProvider;
+module.exports = BountyHunter;

@@ -1,8 +1,10 @@
+// app/api/addBountyHunter/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
-import connectToDatabase from '@/lib/mongodb';
+import connectToDatabase from '@/lib/mongodb'; 
 
-const BountyProviderSchema = new mongoose.Schema({
+// Define the BountyHunter schema
+const BountyHunterSchema = new mongoose.Schema({
   // Core Identity Fields
   walletAddress: {
     type: String,
@@ -30,67 +32,52 @@ const BountyProviderSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-  website: {
-    type: String,
-    default: null
+  skills: {
+    type: [String],
+    default: []
   },
   githubProfile: {
     type: String,
     default: null
   },
-  companyName: {
-    type: String,
-    default: null
+  joinedDate: {
+    type: Date,
+    default: Date.now
   },
-  
-  // Bounty Management
-  bountiesListed: {
+
+  // Bounty Participation
+  bountiesParticipatedIn: {
     type: Number,
     default: 0
   },
-  bountiesDistributed: {
+  bountiesWon: {
     type: Number,
     default: 0
   },
-  totalAmountDistributed: {
+  totalAmountWon: {
     type: Number,
     default: 0
   },
   activeBounties: {
     type: [String],
     default: []
-  },
-  completedBounties: {
-    type: [String],
-    default: []
-  },
-  
-  // Financial Information
-  availableBalance: {
-    type: Number,
-    default: 0
-  },
-  lockedBalance: {
-    type: Number,
-    default: 0
   }
 }, {
   timestamps: true // Adds createdAt and updatedAt fields automatically
 });
 
 // Create the model (only if it doesn't exist)
-const BountyProvider = mongoose.models.BountyProvider || mongoose.model('BountyProvider', BountyProviderSchema);
+const BountyHunter = mongoose.models.BountyHunter || mongoose.model('BountyHunter', BountyHunterSchema);
 
 // Define the expected request body type
-interface AddBountyProviderRequest {
+interface AddBountyHunterRequest {
   walletAddress: string;
   email: string;
   name: string;
   profilePicture?: string;
   bio?: string;
-  website?: string;
+  skills?: string[];
   githubProfile?: string;
-  companyName?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -99,7 +86,7 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
 
     // Parse the request body
-    const body: AddBountyProviderRequest = await request.json();
+    const body: AddBountyHunterRequest = await request.json();
 
     // Validate required fields
     if (!body.walletAddress || !body.email || !body.name) {
@@ -109,58 +96,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if a provider with the same wallet address or email already exists
-    const existingProvider = await BountyProvider.findOne({
+    // Check if a hunter with the same wallet address or email already exists
+    const existingHunter = await BountyHunter.findOne({
       $or: [
         { walletAddress: body.walletAddress },
         { email: body.email }
       ]
     });
 
-    if (existingProvider) {
+    if (existingHunter) {
       return NextResponse.json(
         { 
-          message: 'Provider already exists',
-          provider: existingProvider 
+          message: 'User already exists',
+          hunter: existingHunter 
         },
         { status: 200 } // Using 200 instead of 409 to indicate this is not an error
       );
     }
 
-    // Create a new bounty provider
-    const newBountyProvider = new BountyProvider({
+
+    // Create a new bounty hunter
+    const newBountyHunter = new BountyHunter({
       walletAddress: body.walletAddress,
       email: body.email,
       name: body.name,
       profilePicture: body.profilePicture || null,
       bio: body.bio || null,
-      website: body.website || null,
+      skills: body.skills || [],
       githubProfile: body.githubProfile || null,
-      companyName: body.companyName || null,
-      bountiesListed: 0,
-      bountiesDistributed: 0,
-      totalAmountDistributed: 0,
-      activeBounties: [],
-      completedBounties: [],
-      availableBalance: 0,
-      lockedBalance: 0
+      joinedDate: new Date(),
+      bountiesParticipatedIn: 0,
+      bountiesWon: 0,
+      totalAmountWon: 0,
+      activeBounties: []
     });
 
-    // Save the new bounty provider to the database
-    const savedProvider = await newBountyProvider.save();
+    // Save the new bounty hunter to the database
+    const savedHunter = await newBountyHunter.save();
 
-    // Return the saved provider
+    // Return the saved hunter
     return NextResponse.json(
       { 
-        message: 'Bounty provider created successfully',
-        provider: savedProvider 
+        message: 'Bounty hunter created successfully',
+        hunter: savedHunter 
       }, 
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error creating bounty provider:', error);
+    console.error('Error creating bounty hunter:', error);
     
-    // Handle validation errors
+    // Handle duplicate key errors specifically
     if (error instanceof mongoose.Error.ValidationError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.message },
@@ -170,7 +155,7 @@ export async function POST(request: NextRequest) {
     
     // Handle other errors
     return NextResponse.json(
-      { error: 'Failed to create bounty provider' },
+      { error: 'Failed to create bounty hunter' },
       { status: 500 }
     );
   }
