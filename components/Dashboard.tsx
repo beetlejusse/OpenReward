@@ -42,26 +42,34 @@ function UserDashboard({
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [userData, setUserData] = useState<any>(null);
 
-  // Form setup for hunter
+  // Form setup for hunter with default name from Civic
   const hunterForm = useForm<HunterFormData>({
     defaultValues: {
-      name: user?.name || "",
+      name: "",
       bio: "",
       skills: "",
       githubProfile: ""
     }
   });
 
-  // Form setup for provider
+  // Form setup for provider with default name from Civic
   const providerForm = useForm<ProviderFormData>({
     defaultValues: {
-      name: user?.name || "",
+      name: "",
       bio: "",
       website: "",
       companyName: "",
       githubProfile: ""
     }
   });
+
+  // Update form default values when user data is available
+  useEffect(() => {
+    if (user?.name) {
+      hunterForm.setValue("name", user.name);
+      providerForm.setValue("name", user.name);
+    }
+  }, [user, hunterForm, providerForm]);
 
   const ethBalance = useBalance({
     address,
