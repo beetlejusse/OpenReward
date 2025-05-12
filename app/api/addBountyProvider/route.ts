@@ -1,86 +1,7 @@
+// app/api/addBountyProvider/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import mongoose from 'mongoose';
-import connectToDatabase from '@/lib/mongodb';
-
-const BountyProviderSchema = new mongoose.Schema({
-  // Core Identity Fields
-  walletAddress: {
-    type: String,
-    required: true,
-    unique: true,
-    index: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    index: true
-  },
-  name: {
-    type: String,
-    required: true
-  },
-  
-  // Profile Information
-  profilePicture: {
-    type: String,
-    default: null
-  },
-  bio: {
-    type: String,
-    default: null
-  },
-  website: {
-    type: String,
-    default: null
-  },
-  githubProfile: {
-    type: String,
-    default: null
-  },
-  companyName: {
-    type: String,
-    default: null
-  },
-  
-  // Bounty Management
-  bountiesListed: {
-    type: Number,
-    default: 0
-  },
-  bountiesDistributed: {
-    type: Number,
-    default: 0
-  },
-  totalAmountDistributed: {
-    type: Number,
-    default: 0
-  },
-  activeBounties: {
-    type: [String],
-    default: []
-  },
-  completedBounties: {
-    type: [String],
-    default: []
-  },
-  
-  // Financial Information
-  availableBalance: {
-    type: Number,
-    default: 0
-  },
-  lockedBalance: {
-    type: Number,
-    default: 0
-  }
-}, {
-  timestamps: true // Adds createdAt and updatedAt fields automatically
-});
-
-// Create the model (only if it doesn't exist)
-const BountyProvider = mongoose.models.BountyProvider || mongoose.model('BountyProvider', BountyProviderSchema);
-
+import connectToDatabase  from '@/lib/mongodb';
+import {BountyProvider} from '@/models/BountyProviderModel';
 // Define the expected request body type
 interface AddBountyProviderRequest {
   walletAddress: string;
@@ -119,11 +40,8 @@ export async function POST(request: NextRequest) {
 
     if (existingProvider) {
       return NextResponse.json(
-        { 
-          message: 'Provider already exists',
-          provider: existingProvider 
-        },
-        { status: 200 } // Using 200 instead of 409 to indicate this is not an error
+        { error: 'A bounty provider with this wallet address or email already exists' },
+        { status: 409 }
       );
     }
 
@@ -157,11 +75,11 @@ export async function POST(request: NextRequest) {
       }, 
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating bounty provider:', error);
     
     // Handle validation errors
-    if (error instanceof mongoose.Error.ValidationError) {
+    if (error.name === 'ValidationError') {
       return NextResponse.json(
         { error: 'Validation error', details: error.message },
         { status: 400 }
@@ -170,7 +88,7 @@ export async function POST(request: NextRequest) {
     
     // Handle other errors
     return NextResponse.json(
-      { error: 'Failed to create bounty provider' },
+      { error: 'Failed to create bounty provider', details: error.message },
       { status: 500 }
     );
   }
