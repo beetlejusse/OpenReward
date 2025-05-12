@@ -1,4 +1,3 @@
-// lib/models/BountyProvider.ts
 import mongoose, { Document, Schema } from 'mongoose';
 
 // Interface for the BountyProvider document
