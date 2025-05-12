@@ -9,7 +9,9 @@ export interface IBountyProvider extends Document {
   bio?: string;
   website?: string;
   githubProfile?: string;
-  companyName?: string;
+  organizationName?: string;
+  organizationRole?: string;
+  organizationGithub?: string; //can be the organization's github profile or the user's github repository
   bountiesListed: number;
   bountiesDistributed: number;
   totalAmountDistributed: number;
@@ -57,7 +59,15 @@ const BountyProviderSchema = new Schema({
     type: String,
     default: null
   },
-  companyName: {
+  organizationName: {
+    type: String,
+    default: null
+  },
+  organizationRole: {
+    type: String,
+    default: null
+  },
+  organizationGithub: {
     type: String,
     default: null
   },
@@ -100,6 +110,9 @@ const BountyProviderSchema = new Schema({
 // Create indexes for frequently queried fields
 BountyProviderSchema.index({ walletAddress: 1 });
 BountyProviderSchema.index({ email: 1 });
+BountyProviderSchema.index({ organizationName: 1 });
+BountyProviderSchema.index({ githubProfile: 1 });
+BountyProviderSchema.index({ organizationGithub: 1 });
 
 // Create the model (check if it already exists to prevent overwriting)
 export const BountyProvider = mongoose.models.BountyProvider || 

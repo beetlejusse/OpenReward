@@ -1,5 +1,15 @@
 import mongoose, {Schema} from 'mongoose';
 
+interface IBountyHunterEntry {
+  email: string;
+  walletAddress: string;
+  joinedAt: Date;
+  prRaised: boolean;
+  prUrl?: string;
+  prRaisedAt?: Date;
+  status: 'INTERESTED' | 'WORKING' | 'SUBMITTED' | 'ACCEPTED' | 'REJECTED';
+}
+
 export interface IBounty {
     contractAddress: string;
     bountyProvider: string;
@@ -7,7 +17,7 @@ export interface IBounty {
     timeInterval: number;
     initialTimestamp: number; 
     status: 'OPEN' | 'COMPLETED' | 'CLOSED' | 'CANCELLED'; 
-    bountyHunters: string[]; 
+    bountyHunters: IBountyHunterEntry[];
     bountyWinner: string | null; 
     issueURL: string;
     title: string; 
@@ -17,10 +27,40 @@ export interface IBounty {
     lastSyncedAt: Date; 
 }
 
+const BountyHunterEntrySchema = new Schema({
+  email: {
+    type: String,
+    required: true
+  },
+  walletAddress: {
+    type: String,
+    required: true
+  },
+  joinedAt: {
+    type: Date,
+    default: Date.now
+  },
+  prRaised: {
+    type: Boolean,
+    default: false
+  },
+  prUrl: {
+    type: String,
+    default: null
+  },
+  prRaisedAt: {
+    type: Date,
+    default: null
+  },
+  status: {
+    type: String,
+    enum: ['INTERESTED', 'WORKING', 'SUBMITTED', 'ACCEPTED', 'REJECTED'],
+    default: 'INTERESTED'
+  }
+});
 
 const BountySchema = new Schema({
-
-    contractAddress: {
+  contractAddress: {
     type: String,
     required: true,
     unique: true,
@@ -52,9 +92,9 @@ const BountySchema = new Schema({
     index: true
   },
   
-  // Participants
+  // Participants - now using the nested schema
   bountyHunters: {
-    type: [String],
+    type: [BountyHunterEntrySchema],
     default: []
   },
   bountyWinner: {
@@ -90,15 +130,16 @@ const BountySchema = new Schema({
     default: Date.now
   }
 }, {
-  timestamps: true // Adds updatedAt field automatically
+  timestamps: true 
 });
 
-// Create indexes for frequently queried fields
 BountySchema.index({ contractAddress: 1 });
 BountySchema.index({ bountyProvider: 1 });
 BountySchema.index({ status: 1 });
 BountySchema.index({ expiresAt: 1 });
+BountySchema.index({ 'bountyHunters.email': 1 });
+BountySchema.index({ 'bountyHunters.walletAddress': 1 });
 
-const Bounty = mongoose.model('Bounty', BountySchema);
+const Bounty = mongoose.models.Bounty || mongoose.model('Bounty', BountySchema);
 
-module.exports = Bounty;
+export default Bounty;
