@@ -7,7 +7,6 @@ interface IBountyHunterEntry {
   prRaised: boolean;
   prUrl?: string;
   prRaisedAt?: Date;
-  status: 'INTERESTED' | 'WORKING' | 'SUBMITTED' | 'ACCEPTED' | 'REJECTED';
 }
 
 export interface IBounty {
