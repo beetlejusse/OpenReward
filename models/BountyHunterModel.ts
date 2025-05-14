@@ -60,11 +60,5 @@ const BountyHunterSchema = new Schema({
   timestamps: true 
 });
 
-// Create indexes for frequently queried fields
-BountyHunterSchema.index({ walletAddress: 1 });
-BountyHunterSchema.index({ email: 1 });
-BountyHunterSchema.index({ githubProfile: 1 });
-
-export const BountyHunter = mongoose.model('BountyHunter', BountyHunterSchema);
-
-module.exports = BountyHunter;
+export const BountyHunter =  mongoose.models.BountyHunter || 
+mongoose.model('BountyHunter', BountyHunterSchema);
