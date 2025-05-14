@@ -5,7 +5,7 @@ type connectionObject = {
 }
 const connection: connectionObject = {}
 
-async function connectToDatabase(): Promise<void>{
+async function dbConnect(): Promise<void>{
     const uri = process.env.NEXT_PUBLIC_MONGO_URI;
     if (!uri) throw new Error("MONGODBURI not found in environment variables");
     if(connection.isConnected){
@@ -23,4 +23,4 @@ async function connectToDatabase(): Promise<void>{
     }
 }
 
-export default connectToDatabase;
+export default dbConnect;
