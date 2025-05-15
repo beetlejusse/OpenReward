@@ -1,29 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBountyProvider } from '@/interfaces/Interface';
 
-// Interface for the BountyProvider document
-export interface IBountyProvider extends Document {
-  walletAddress: string;
-  email: string;
-  name: string;
-  profilePicture?: string;
-  bio?: string;
-  website?: string;
-  githubProfile?: string;
-  organizationName?: string;
-  organizationRole?: string;
-  organizationGithub?: string; //can be the organization's github profile or the user's github repository
-  bountiesListed: number;
-  bountiesDistributed: number;
-  totalAmountDistributed: number;
-  activeBounties: string[];
-  completedBounties: string[];
-  availableBalance: number;
-  lockedBalance: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Schema definition
 const BountyProviderSchema = new Schema({
   walletAddress: {
     type: String,
@@ -42,7 +19,6 @@ const BountyProviderSchema = new Schema({
     required: true
   },
   
-  // Profile Information
   profilePicture: {
     type: String,
     default: null
@@ -107,13 +83,5 @@ const BountyProviderSchema = new Schema({
   timestamps: true
 });
 
-// Create indexes for frequently queried fields
-BountyProviderSchema.index({ walletAddress: 1 });
-BountyProviderSchema.index({ email: 1 });
-BountyProviderSchema.index({ organizationName: 1 });
-BountyProviderSchema.index({ githubProfile: 1 });
-BountyProviderSchema.index({ organizationGithub: 1 });
-
-// Create the model (check if it already exists to prevent overwriting)
 export const BountyProvider = mongoose.models.BountyProvider || 
   mongoose.model<IBountyProvider>('BountyProvider', BountyProviderSchema);

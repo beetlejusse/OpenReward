@@ -1,30 +1,5 @@
 import mongoose, {Schema} from 'mongoose';
-
-interface IBountyHunterEntry {
-  email: string;
-  walletAddress: string;
-  joinedAt: Date;
-  prRaised: boolean;
-  prUrl?: string;
-  prRaisedAt?: Date;
-}
-
-export interface IBounty {
-    contractAddress: string;
-    bountyProvider: string;
-    bountyAmount: number;
-    timeInterval: number;
-    initialTimestamp: number; 
-    status: 'OPEN' | 'COMPLETED' | 'CLOSED' | 'CANCELLED'; 
-    bountyHunters: IBountyHunterEntry[];
-    bountyWinner: string | null; 
-    issueURL: string;
-    title: string; 
-    description: string;
-    createdAt: Date;
-    expiresAt: Date; 
-    lastSyncedAt: Date; 
-}
+import { IBountyHunterEntry, IBounty } from '@/interfaces/Interface';
 
 const BountyHunterEntrySchema = new Schema({
   email: {
@@ -131,13 +106,6 @@ const BountySchema = new Schema({
 }, {
   timestamps: true 
 });
-
-BountySchema.index({ contractAddress: 1 });
-BountySchema.index({ bountyProvider: 1 });
-BountySchema.index({ status: 1 });
-BountySchema.index({ expiresAt: 1 });
-BountySchema.index({ 'bountyHunters.email': 1 });
-BountySchema.index({ 'bountyHunters.walletAddress': 1 });
 
 const Bounty = mongoose.models.Bounty || mongoose.model('Bounty', BountySchema);
 
