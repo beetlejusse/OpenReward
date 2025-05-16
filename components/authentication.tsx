@@ -16,6 +16,7 @@ import {
   Wallet,
   AlertCircle,
   Loader2,
+  CheckCircle,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { HunterFormData, ProviderFormData } from "@/interfaces/Interface";
 
-// User role types
 type UserRole = "hunter" | "provider" | null;
 
 function UserDashboard({
@@ -40,9 +40,12 @@ function UserDashboard({
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [userData, setUserData] = useState<any>(null);
+  const [verificationStatus, setVerificationStatus] = useState<
+    "unverified" | "pending" | "verified" | "error" | null
+  >(null);
 
   const hunterForm = useForm<HunterFormData>({
-    defaultValues: {
+    defaultValues: {  
       name: "",
       bio: "",
       skills: "",
@@ -57,6 +60,8 @@ function UserDashboard({
       website: "",
       companyName: "",
       githubProfile: "",
+      githubOrgName: "",
+      verificationMethod: undefined,
     },
   });
 
@@ -122,87 +127,6 @@ function UserDashboard({
     setShowOnboarding(true);
   };
 
-  //  const onHunterSubmit = async (data: HunterFormData) => {
-  //   if (!user?.email || !address) return;
-    
-  //   setSaveStatus("saving");
-    
-  //   try {
-  //     const hunterData = {
-  //       walletAddress: address,
-  //       email: user.email,
-  //       name: data.name,
-  //       bio: data.bio || null,
-  //       skills: data.skills.split(',').map(skill => skill.trim()),
-  //       githubProfile: data.githubProfile || null
-  //     };
-      
-  //     const response = await fetch('/api/addBountyHunter', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(hunterData),
-  //     });
-      
-  //     const responseData = await response.json();
-      
-  //     if (response.ok) {
-  //       setSaveStatus("saved");
-  //       setUserData(responseData.hunter);
-  //       setShowOnboarding(false);
-  //     } else {
-  //       setSaveStatus("error");
-  //       console.error("Error saving hunter data:", responseData.error);
-  //     }
-  //   } catch (error) {
-  //     setSaveStatus("error");
-  //     console.error("Error saving hunter data:", error);
-  //   }
-  // };
-
-  // // Handle provider form submission
-  // const onProviderSubmit = async (data: ProviderFormData) => {
-  //   if (!user?.email || !address) return;
-    
-  //   setSaveStatus("saving");
-    
-  //   try {
-  //     const providerData = {
-  //       walletAddress: address,
-  //       email: user.email,
-  //       name: data.name,
-  //       bio: data.bio || null,
-  //       website: data.website || null,
-  //       companyName: data.companyName || null,
-  //       githubProfile: data.githubProfile || null
-  //     };
-      
-  //     const response = await fetch('/api/addBountyProvider', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(providerData),
-  //     });
-      
-  //     const responseData = await response.json();
-      
-  //     if (response.ok) {
-  //       setSaveStatus("saved");
-  //       setUserData(responseData.provider);
-  //       setShowOnboarding(false);
-  //     } else {
-  //       setSaveStatus("error");
-  //       console.error("Error saving provider data:", responseData.error);
-  //     }
-  //   } catch (error) {
-  //     setSaveStatus("error");
-  //     console.error("Error saving provider data:", error);
-  //   }
-  // };
-
-  // will fix them when i have time
   const onHunterSubmit = async (data: HunterFormData) => {
     if (!user?.email || !address) return;
 
@@ -261,6 +185,36 @@ function UserDashboard({
       } else {
         console.error("Error saving provider data:", (error as Error).message);
       }
+    }
+  };
+
+  const handleOrgVerification = async () => {
+    const { githubOrgName, verificationMethod } = providerForm.getValues();
+
+    if (!githubOrgName || !verificationMethod) {
+      setVerificationStatus("error");
+      return;
+    }
+
+    setVerificationStatus("pending");
+
+    try {
+      const response = await axios.post("/api/verifyGithubOrg", {
+        orgName: githubOrgName,
+        method: verificationMethod,
+        walletAddress: address,
+      });
+
+      if (response.data.success) {
+        setVerificationStatus("verified");
+        // Update form values with verified org
+        providerForm.setValue("githubOrgName", githubOrgName);
+      } else {
+        setVerificationStatus("error");
+      }
+    } catch (error) {
+      setVerificationStatus("error");
+      console.error("Verification failed:", error);
     }
   };
 
@@ -492,6 +446,33 @@ function UserDashboard({
                     placeholder="https://github.com/username"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    GitHub Organization
+                  </label>
+                  <input
+                    {...providerForm.register("githubOrgName")}
+                    className="w-full px-3 py-2 bg-background/50 border border-primary/20 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    placeholder="Organization name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Verification Method
+                  </label>
+                  <select
+                    {...providerForm.register("verificationMethod", {
+                      required: true,
+                    })}
+                    className="w-full px-3 py-2 bg-background/50 border border-primary/20 rounded-md"
+                  >
+                    <option value="">Select method</option>
+                    <option value="token">Verification Token</option>
+                    <option value="branch">Temporary Branch</option>
+                  </select>
+                </div>
               </div>
 
               {saveStatus === "error" && (
@@ -500,6 +481,26 @@ function UserDashboard({
                   Error saving profile. Please try again.
                 </div>
               )}
+
+              <div className="mt-4">
+                <Button
+                  type="button"
+                  onClick={handleOrgVerification}
+                  disabled={verificationStatus === "verified"}
+                  className="w-full mb-2 bg-secondary hover:bg-secondary/80"
+                >
+                  {verificationStatus === "pending" ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
+                  Verify Organization
+                </Button>
+                {verificationStatus === "verified" && (
+                  <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 text-green-500 rounded-md flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4" />
+                    Organization verified successfully!
+                  </div>
+                )}
+              </div>
 
               <Button
                 type="submit"
@@ -591,7 +592,7 @@ function UserDashboard({
                 </p>
 
                 {userData.bio && (
-                  <div className="py-1">
+                  <div className="py-1 flex justify-between">
                     <span className="text-muted-foreground">Bio:</span>
                     <p className="mt-1 text-sm">{userData.bio}</p>
                   </div>
@@ -699,6 +700,21 @@ function UserDashboard({
                         ""
                       )}
                     </a>
+                  </p>
+                )}
+
+                {userData?.githubOrgVerified && (
+                  <p className="flex justify-between py-1">
+                    <span className="text-muted-foreground">
+                      Verified Organization:
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="bg-green-500/10 text-green-500"
+                    >
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      {userData.githubOrgName}
+                    </Badge>
                   </p>
                 )}
               </div>

@@ -23,7 +23,7 @@ export function Navbar() {
   const navItems = [
     { id: "home", label: "Home", href: "/" },
     { id: "explore", label: "Explore", href: "#bounties" },
-    { id: "dashboard", label: "Dashboard", href: "#" },
+    { id: "dashboard", label: "Dashboard", href: "/dashboard" },
     { id: "about", label: "About", href: "#how-it-works" },
   ]
 

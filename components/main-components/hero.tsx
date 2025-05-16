@@ -80,7 +80,7 @@ export function HeroSection() {
         <div className="noise" />
       </div>
 
-      <div className="container mx-auto max-w-7xl mt-11">
+      <div className="container mx-auto max-w-7xl mt-9">
         <div className="flex flex-col items-center text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -127,20 +127,9 @@ export function HeroSection() {
                   className="group bg-primary hover:bg-primary/90 rounded-full px-6"
                 >
                   <Plus className="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" />
-                  List a Bounty
+                  Get Started
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
-              </Link>
-
-              <Link href={"/bounty"}>
-              <Button
-                size="lg"
-                className="group bg-primary hover:bg-primary/90 rounded-full px-6"
-              >
-                <Plus className="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" />
-                Solve Bounty
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Button>
               </Link>
             </motion.div>
           </motion.div>
