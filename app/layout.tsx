@@ -22,13 +22,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-        <body className={`font-serif `}>
+        <body className={`font-mono `}>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
             enableSystem={false}
           >
-            <CustomCursor />
+            {/* <CustomCursor /> */}
             <ToastProvider />
             <div className="flex min-h-screen">
               <div className="flex-1 overflow-hidden">
