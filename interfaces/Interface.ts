@@ -41,6 +41,7 @@ export interface IBountyProvider extends Document {
     bountiesListed: number;
     bountiesDistributed: number;
     totalAmountDistributed: number;
+    repos: string[]; 
     activeBounties: string[];
     completedBounties: string[];
     availableBalance: number;
@@ -83,4 +84,6 @@ export interface ProviderFormData {
     website?: string
     companyName?: string
     githubProfile?: string
+    githubOrgName?: string;
+  verificationMethod?: 'token' | 'branch';
 }
